@@ -12,4 +12,11 @@ class Prim(Hedra):
     pass
         
 class Channel(Prim):
-    def __init__(self, len, wid, loc=)
+    def __init__(self, len, wid, loc=None, prev=None):
+        super(Channel, self).__init__()
+    
+    def Join(self, soutlet_name, other, ooutlet_name):
+        pass
+    
+    @property
+    def 
