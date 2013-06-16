@@ -5,7 +5,7 @@ Created on Jul 15, 2011
 '''
 import unittest, mock, math
 
-import prim
+from stack.layer.block.prim.prim import Channel
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -17,9 +17,9 @@ class Test(unittest.TestCase):
     
     def testChannel(self):
         start_loc = ((0,3.0,0),(0,4.0,0))
-        c1 = prim.Channel(xdim=2,ydim=1,layer=self.layer,loc=start_loc)
-        c2 = prim.Channel(xdim=4,ydim=1,layer=self.layer,prev=c1)
-        c3 = prim.Channel(xdim=6,ydim=1,layer=self.layer,prev=c2)
+        c1 = Channel(xdim=2,ydim=1,layer=self.layer,loc=start_loc)
+        c2 = Channel(xdim=4,ydim=1,layer=self.layer,prev=c1)
+        c3 = Channel(xdim=6,ydim=1,layer=self.layer,prev=c2)
         for i,c in enumerate((c1,c2,c3)):
             c.MoveToPos(offang=(i+1)*(math.pi/7.0))
         for c in (c2,c3):
