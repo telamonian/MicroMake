@@ -1,66 +1,61 @@
-'''
+'''se
 Created on Jun 4, 2013
 
 @author: tel
 '''
 
 from prim.prim import Prim
-from prim.joint import Joint
+from prim.joint import RoundJoint
+from port import Port, Loc
 from block_error import *
 
 class Block(Prim):
-    def __init__(self, layer, loc=None, prev=None, innum=None, outnum=None, **kwargs):
-        self.layer = layer
+    def __init__(self, loc=None, prev=None, innum=0, outnum=0, **kwargs):
         self.prev = prev
         self.innum = innum
         self.outnum = outnum
+        self.inports = []
+        self.outports = []
         if loc!=None:
             self.loc = loc
         elif prev!=None:
-            self.loc = self.GetPrevOutlet(outnum)
+            self.loc = self.GetPrevOutport()
         else:
             raise UnpositionedBlockError
         super(Block, self).__init__(**kwargs)
     
-    def GetOutlet(self, i=None):
-        if i==None:
-            i=0
-        return [self.hedra.get_vertex(j) for j in self._outlets[i]]
+    def SetInport(self, v0, v1):
+        self.inports.append(Port(self, v0, v1))
     
-    def GetPrevOutlet(self, i=None):
-        return self.prev.GetOutlet(i)
+    def GetInport(self, i=0):
+        return self.inports[i]
         
-    def SetOutlet(self, seg, i=None):
-        if i==None:
-            i=0
-        try:
-            self._outlets[i] = seg
-        except AttributeError:
-            self._outlets = {}
-            self._outlets[i] = seg
+    def SetOutport(self, v0, v1):
+        self.outports.append(Port(self, v0, v1))
     
-    def GetInlet(self, i=None):
+    def GetOutport(self, i=0):
+        return self.outports[i]
+    
+    def GetPrevOutport(self, i=None):
         if i==None:
-            i=0
-        return [self.hedra.get_vertex(j) for j in self._inlets[i]]
+            i = self.outnum
+        return self.prev.GetOutport(i)
+    
+    #def Join(self, static, mobile, joint, **kwargs):
         
-    def SetInlet(self, seg, i=None):
-        if i==None:
-            i=0
-        try:
-            self._inlets[i] = seg
-        except AttributeError:
-            self._inlets = {}
-            self._inlets[i] = seg
     
 class Channel(Block):
-    def __init__(self, **kwargs):
+    def __init__(self, length, width, ang, **kwargs):
         super(Channel, self).__init__(**kwargs)
+        self.length = length
+        self.width = width
+        self.ang = ang
+        self.Build()
     
     def Build(self):
-        self.hedra.make_box(self.xdim, self.ydim, 1.0)
-        self.SetInlet((0,3))
-        self.SetOutlet((1,2))    
-    
-    def Join(self, static, mobile, joint):
-
+        self.hedra.make_box(self.length, self.width, 1.0)
+        self.SetInport(0,3)
+        self.SetOutport(1,2)
+        
+    def SetJoint(self):
+        self.joint = RoundJoint(self.loc, self.GetInport(self.innum), ang=self.ang)

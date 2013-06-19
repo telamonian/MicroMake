@@ -39,11 +39,20 @@ class Rect(Prim):
     def __init__(self, xdim, ydim, **kwargs):
         super(Rect, self).__init__(**kwargs)
         self.xdim = float(xdim)
-        self.ydim = float(ydim)
-        self.zpos = self.layer.zpos
+        self.ydim = float(ydim) 
         self.Build()
         
     def Build(self):
         self.hedra.make_box(self.xdim, self.ydim, 1.0)
-        self.SetInlet((0,3))
-        self.SetOutlet((1,2))
+        
+class Cyl(Prim):
+    botface = 0
+    def __init__(self, rad, height, **kwargs):
+        super(Cyl, self).__init__(**kwargs)
+        self.rad = float(rad)
+        self.height = float(height) 
+        self.Build()
+        
+    def Build(self):
+        self.hedra.make_cylinder(self.rad, self.height, False, 100)
+        self.hedra = self.hedra.rotate(90,0,0).translate(0,2*self.rad,0)

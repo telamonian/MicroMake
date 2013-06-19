@@ -17,7 +17,7 @@ class Port(object):
         
     def Recover(self):
         for i,ivertex in enumerate(self._stored_vertices):
-            for j,jvertex in enumerate(self.hedra.get_vertices()):
+            for j,jvertex in enumerate(self.block.hedra.get_vertices()):
                 if np.allclose(ivertex, jvertex):
                     self.__setattr__('v%d' % i, j)
                     break
@@ -28,8 +28,21 @@ class Port(object):
     
     @property
     def vertices(self):
-        return np.array([self.hedra.get_vertex(i) for i in self.vertex_indices])
+        return np.array([self.block.hedra.get_vertex(int(i)) for i in self.vertex_indices])
     
     @property
     def midpoint(self):
         return np.mean(self.vertices, 0)
+    
+    @property
+    def width(self):
+        return np.sqrt(np.sum((self.vertices[1] - self.vertices[0])**2))
+        
+class Loc(Port):
+    def __init__(self, pnt0, pnt1):
+        self.pnt0 = pnt0
+        self.pnt1 = pnt1
+    
+    @property
+    def vertices(self):
+        return np.array((self.pnt0, self.pnt1))
