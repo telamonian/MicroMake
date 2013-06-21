@@ -48,7 +48,7 @@ class Mortar(object):
     
 class RoundMortar(Mortar):
     def SetMortar(self):
-        cyl = Cyl(self.lport.width/2.0, 1)
+        cyl = Cyl(self.lport.width/2.0, 10)
         cyl.Transform(cyl.CenterAt(self.lport.midpoint))
         self.shapes.append(cyl)
         super(RoundMortar, self).SetMortar()

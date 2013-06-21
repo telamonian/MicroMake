@@ -11,7 +11,10 @@ class Port(object):
         self.v0 = v0
         self.v1 = v1
         self._stored_vertices = self.vertices
-        
+    
+    def Transfer(self, newblock):
+        return Port(newblock, self.v0, self.v1)
+    
     def Set(self):
         self._stored_vertices = self.vertices
         
@@ -33,6 +36,10 @@ class Port(object):
     @property
     def midpoint(self):
         return np.mean(self.vertices, 0)
+    
+    @property
+    def theta(self):
+        pass
     
     @property
     def width(self):

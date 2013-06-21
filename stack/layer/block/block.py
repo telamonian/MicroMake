@@ -41,9 +41,27 @@ class Block(Prim):
             i = self.outnum
         return self.prev.GetOutport(i)
     
-    #def Join(self, static, mobile, joint, **kwargs):
-        
+    def __add__(self, other):
+        comboblock = Block()
+        joint = other.Joint(self)
+        comboblock.hedra = self.hedra + other.hedra.RetTransform(joint.tmat) + joint.mortar
     
+    def AddHedra(self, other):
+        joint = other.Joint(self)
+        return self.hedra + other.hedra.RetTransform(joint.tmat) + joint.mortar
+        
+    def AddPorts(self, other):
+        toutports = self.outports[:]
+        tinports = other.inports[:]
+        for portlist,portnum in zip((toutports, tinports),(self.outnum, other.innum)):
+            try:
+                for i in reversed(portnum):
+                    portlist.pop(i)
+            except TypeError:
+                portlist.pop(portnum)
+        
+        
+        
 class Channel(Block):
     def __init__(self, length, width, ang, **kwargs):
         super(Channel, self).__init__(**kwargs)
@@ -53,7 +71,7 @@ class Channel(Block):
         self.Build()
     
     def Build(self):
-        self.hedra.make_box(self.length, self.width, 1.0)
+        self.hedra.make_box(self.length, self.width, 10)
         self.SetInport(0,3)
         self.SetOutport(1,2)
         

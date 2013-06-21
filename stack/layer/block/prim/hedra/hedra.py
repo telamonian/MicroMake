@@ -84,22 +84,21 @@ class Hedra(object):
             
     def Save2D(self, fname):
         f = open(fname, 'w')
-        surface = cairo.PSSurface(f, 100, 100)
+        surface = cairo.PSSurface(f, 1000, 1000)
         ctx = cairo.Context(surface)
         ctx.set_source_rgb(0, 0, 0)
         for path in self.GroupPaths(self.MidSlice()):
-            ctx.move_to(*self.hedra.get_vertex(path[0][0])[0:2])
-            ctx.line_to(*self.hedra.get_vertex(path[0][1])[0:2])
-            for start,end in path[1:]:
-                ctx.line_to(*self.hedra.get_vertex(end)[0:2])
-            ctx.close_path()
-            ctx.set_line_width(.1)
-            ctx.stroke()
+            ctx.move_to(*((self.hedra.get_vertex(path[0])))[0:2])
+            for pnt in path[1:]:
+                ctx.line_to(*(10*(self.hedra.get_vertex(pnt)))[0:2])
             ctx.fill()
+            ctx.set_line_width(.01)
+            ctx.stroke()
         
         surface.flush()
         surface.finish()
         f.close()
+        
     def Transform(self, mat):
         '''transform hedra based on a 4x4 matrix'''
         flatmat = [j for i in mat for j in i]
@@ -179,14 +178,21 @@ class Hedra(object):
     
     @staticmethod
     def GroupPaths(paths):
-        lastp = []
         groups = []
+        pset = set([point for points in paths for point in points])
+        pdict = {}
         for path in paths:
-            try:
-                i = lastp.index(path[0])
-                groups[i].append(path)
-                lastp[i] = path[1]
-            except ValueError:
-                groups.append([path])
-                lastp.append(path[1])
+            pdict[path[0]] = pdict.get(path[0], []) + [path[1]]
+            pdict[path[1]] = pdict.get(path[1], []) + [path[0]]
+        while len(pset) > 0:
+            group = [pset.pop()]
+            last = group[0]
+            now = pdict[group[0]][0]
+            while now!=group[0]:
+                group.append(now)
+                pset.remove(now)
+                tnow = pdict[now][0] if pdict[now][0]!=last else pdict[now][1]
+                last = now
+                now = tnow
+            groups.append(group)
         return groups
