@@ -20,11 +20,17 @@ class Layer(Transformable):
     
     def AddBranch(self, branch):
         self.branches.append(branch)
+        
+    def AddBranches(self, branches):
+        for branch in branches:
+            self.AddBranch(branch)
     
     def Build(self):
         #position all of the primitives wrt their blocks
         for branch in self.branches:
             for block in branch.blocks:
+                if not block.go:
+                    block.Go()
                 for prim in block.prims:
                     if prim.transformed==False:
                         prim.SelfTrans()
@@ -33,40 +39,45 @@ class Layer(Transformable):
             for prev, block in zip(branch.blocks[:-1], branch.blocks[1:]):
                 if block.transformed==False:
                     block.Join(prev)
-#        #apply optional branch transform
-#        for branch in self.branches:
-#            if branch.transformed==False:
-#                branch.SelfTrans()
-#        #apply optional layer transform
-#        if self.transformed==False:
-#            self.SelfTrans()
+        #apply optional branch transform
+        for branch in self.branches:
+            if branch.transformed==False:
+                branch.SelfTrans()
+        #apply optional layer transform
+        if self.transformed==False:
+            self.SelfTrans()
     
-    def Draw(self, fname):
+    def Draw(self, fname, *args):
         pnttoum = .002834646
         f = open(fname, 'w')
         surface = cairo.PSSurface(f, 10000, 10000)
-        surface.set_device_offset(3000,3000)
+        surface.set_device_offset(4000,4000)
         ctx = cairo.Context(surface)
         ctx.scale(pnttoum, pnttoum)
         ctx.set_source_rgb(0, 0, 0)
-        for branch in self.branches:
-            if branch.noprev:
-                blocks = branch.blocks
-            else: 
-                blocks = branch.blocks[1:]
-            for block in blocks:
-                try:
-                    prims = block.prims + [block.mortar]
-                except AttributeError:
-                    prims = block.prims
-                for prim in prims:
-                    ctx.move_to(*prim.GetVertexCoords(False)[0][0:2])
-                    for pnt in prim.GetVertexCoords(False):
-                        ctx.line_to(*pnt[0:2])
-                    ctx.close_path()
-                    ctx.fill()
-                    ctx.set_line_width(.01)
-                    ctx.stroke()
+        for layer in [self] + list(args):
+            for branch in layer.branches:
+                if branch.blocks[0].placed:
+                    blocks = branch.blocks
+                else: 
+                    blocks = branch.blocks[1:]
+                for block in blocks:
+                    try:
+                        prims = block.prims + [block.mortar]
+                    except AttributeError:
+                        prims = block.prims
+                    for prim in prims:
+                        if prim.neg:
+                            ctx.set_source_rgb(255,255,255)
+                        else:
+                            ctx.set_source_rgb(0,0,0)
+                        ctx.move_to(*prim.GetVertexCoords(False)[0][0:2])
+                        for pnt in prim.GetVertexCoords(False):
+                            ctx.line_to(*pnt[0:2])
+                        ctx.close_path()
+                        ctx.fill()
+                        ctx.set_line_width(.01)
+                        ctx.stroke()
         surface.flush()
         surface.finish()
         f.close()

@@ -22,7 +22,12 @@ class Branch(Transformable):
             self.tmat = tmat
         #flag for branches whose first block is not part of another branch
         self.noprev = noprev
-        
+    
+    def Copy(self):
+        tmp = super(Branch, self).Copy()
+        tmp.blocks[0] = self.blocks[0]
+        return tmp
+    
     def Build(self):
         join = self.__getattribute__(self.join)
         joint = Branch.Joint(*join(self.blocks[0], self.initport))

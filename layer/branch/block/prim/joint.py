@@ -4,10 +4,10 @@ Created on Jun 13, 2013
 @author: tel
 '''
 
-from hedra.hedra import Hedra
-from prim import Cyl
+from prim import Circ
+from transformable.transformable import Transformable
 
-class Joint(Hedra):
+class Joint(Transformable):
     def __init__(self, lport, rport, **kwargs):
         self.lport = lport
         self.rport = rport
@@ -29,12 +29,24 @@ class Tmat(object):
             tmat = None
         self.tmat = tmat
         
+    def RetTmat(self, mats):
+        tmat = mats[0]
+        for mat in mats[1:]:
+            tmat = mat.dot(tmat)
+        return tmat
+        
 class MidpointTmat(Tmat):
     '''requires ang argument in mixin'ed constructor'''
     def SetTmat(self):
         self.mats.append(self.OverlaySegMat(self.lport.vertices, self.rport.vertices))
         self.mats.append(self.RotatePointMat(self.ang, self.lport.midpoint))
         super(MidpointTmat, self).SetTmat()
+        
+    def RetTamt(self):
+        mats = []
+        mats.append(self.OverlaySegMat(self.lport.vertices, self.rport.vertices))
+        mats.append(self.RotatePointMat(self.ang, self.lport.midpoint))
+        super(MidpointTmat, self).RetTmat(mats)
         
 class Mortar(object):
     def SetMortar(self):
@@ -48,9 +60,9 @@ class Mortar(object):
     
 class RoundMortar(Mortar):
     def SetMortar(self):
-        cyl = Cyl(self.lport.width/2.0, 10)
-        cyl.Transform(cyl.CenterAt(self.lport.midpoint))
-        self.shapes.append(cyl)
+        circ = Circ(self.lport.width/2.0)
+        circ.Transform(circ.CenterAt(self.lport.midpoint))
+        self.shapes.append(circ)
         super(RoundMortar, self).SetMortar()
         
 RoundJoint = type('RoundJoint', (Joint, MidpointTmat, RoundMortar), {})
