@@ -11,6 +11,7 @@ from block.block import Channel, RoundJoint
 from block.prim.transformable.transformable import Transformable
 
 class Branch(Transformable):
+    name = 'Branch'
     
     def __init__(self, blocks, join='Round', tmat=None, noprev=False):
         self.blocks = blocks

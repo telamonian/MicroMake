@@ -10,6 +10,14 @@ from transformable.transformable import Transformable
 from transformable.vertex import Vertex
 
 class Prim(Transformable):
+    '''
+    class Prim:
+    Prim inherits from the Transformable class, giving it access to the 
+    transformation methods, a copy method, and methods for generating generic
+    transformation matrices.
+    '''
+    name = 'Prim'
+    
     def __init__(self, pnts, tmat=None):
         if tmat==None:
             self.tmat = np.identity(4)

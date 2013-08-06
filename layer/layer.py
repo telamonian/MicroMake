@@ -8,6 +8,8 @@ import numpy as np
 from branch.block.prim.transformable.transformable import Transformable
 
 class Layer(Transformable):
+    name = 'Layer'
+    
     def __init__(self, branches=None, tmat=None):
         if branches==None:
             self.branches = []
@@ -62,11 +64,7 @@ class Layer(Transformable):
                 else: 
                     blocks = branch.blocks[1:]
                 for block in blocks:
-                    try:
-                        prims = block.prims + [block.mortar]
-                    except AttributeError:
-                        prims = block.prims
-                    for prim in prims:
+                    for prim in block.children:
                         if prim.neg:
                             ctx.set_source_rgb(255,255,255)
                         else:

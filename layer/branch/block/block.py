@@ -14,9 +14,11 @@ from prim.transformable.transformable import Transformable
 from port import Port, MidPort
 from block_error import *
 
-Joint = namedtuple('Joint', 'tmat, mortar')
+Joint = namedtuple('Joint', 'tmat, mortars')
 
 class Block(Transformable):
+    name = 'Block'
+    
     def __init__(self, props, inspec=None, outspec=None, innum=0, outnum=0, tmat=None, join='Round', **kwargs):
         self.prims = []
         self.props = props
@@ -31,6 +33,7 @@ class Block(Transformable):
         else:
             self.tmat = tmat
         self.join = join
+        self.mortars = []
         self.placed = False
         self.go = False
     
@@ -74,8 +77,8 @@ class Block(Transformable):
     def Join(self, prev):
         join = self.__getattribute__(self.join)
         joint = Joint(*join(prev))
+        self.mortars += joint.mortars
         self.Trans(joint.tmat)
-        self.mortar = joint.mortar
         
     def Round(self, prev):
         outport = prev.GetOutport(self.outnum)
@@ -93,9 +96,11 @@ class Block(Transformable):
         mortar.Go()
         for prim in mortar.prims:
             prim.SelfTrans()
-        mtmat = mortar.GetInport().OverlayMidpoint(outport)
+        mtmat = mortar.GetInport().OverlayMidpoint(inport)
         mortar.Trans(mtmat)
-        return tmat, mortar.prims[0]
+        for prim in mortar.prims:
+            prim.Block_transformed = False
+        return tmat, [mortar.prims[0]]
     
     def Place(self, seg):
         self.placed = True
@@ -133,7 +138,7 @@ class Block(Transformable):
     
     @property
     def children(self):
-        return self.prims
+        return self.prims + self.mortars
     
 class Channel(Block):
     def __init__(self, length, width, **kwargs):
@@ -258,12 +263,14 @@ class RectTrap(Block):
         chamber = Circ(rad)
         trap = Rect(np.sin(math.pi/4)*rad, np.sin(math.pi/4)*rad)
         trap.neg = True
-        mouth = Rect(mwidth, mdepth)
+        mouth = Rect(mwidth, mdepth+10)
         '''using chamber as the central shape, generate and assign tmats'''
         cen = Vertex(*chamber.GetCentroid(True))
         chan.tmat = Prim.RotatePointMat(math.pi/2, cen.xyz).dot(Prim.TranslateMat(chan.GetCentroid()[0:3], cen.xyz))
         trap.tmat = Prim.TranslateMat(trap.GetCentroid()[0:3], cen.xyz)
         midpoint_mouth_top = Prim.Midpoint([mouth.vertices[1].xyz, mouth.vertices[2].xyz])
+        #correct for anomalous white space that sometimes occurs in trap
+        midpoint_mouth_top[1] -= 10
         midpoint_trap_top = Prim.Midpoint([trap.GetVertex(1, True).xyz, trap.GetVertex(2, True).xyz])
         mouth.tmat = Prim.TranslateMat(midpoint_mouth_top, midpoint_trap_top)
         traprot = Prim.RotatePointMat(tang, cen.xyz)

@@ -10,10 +10,16 @@ from transmat import rotation_matrix, translation_matrix
 
 class Transformable(object):
     transformed = False
+    Prim_transformed = False
+    Block_transformed = False
+    Branch_transformed = False
+    Layer_transformed = False
     
-    def _Trans(self, tmat):
-        for child in self.children:
-            child._Trans(tmat)
+    def _Trans(self, tmat, tmat_owner):
+        if not self.__getattribute__(tmat_owner):
+            self.__setattr__(tmat_owner, True)
+            for child in self.children:
+                child._Trans(tmat, tmat_owner)
     
     def _RetTrans(self, tmat):
         newb = deepcopy(self)
@@ -21,21 +27,33 @@ class Transformable(object):
         return newb
     
     def Trans(self, tmat):
-        self.transformed = True
-        self._Trans(tmat)
+        self._Trans(tmat, self.name + '_transformed')
             
     def RetTrans(self, tmat):
         return self._RetTrans(tmat)
     
     def SelfTrans(self):
-        self.transformed = True
-        self._Trans(self.tmat)
+        self._Trans(self.tmat,  self.name + '_transformed')
         
     def SelfRetTrans(self):
         self._RetTrans(self.tmat)
         
     def Copy(self):
-        return deepcopy(self)
+        tmp = deepcopy(self)
+        tmp.CleanRec()
+        return tmp
+    
+    def Clean(self):
+        self.transformed = False
+        self.Prim_transformed = False
+        self.Block_transformed = False
+        self.Branch_transformed = False
+        self.Layer_transformed = False
+        
+    def CleanRec(self):
+        self.Clean()
+        for child in self.children:
+            child.Clean()
     
     @property
     def children(self):

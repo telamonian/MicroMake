@@ -26,8 +26,8 @@ class Test(unittest.TestCase):
     def testSplitTraps(self):
         testSplitTraps(self)
     
-    def testHexHex(self):
-        testHexHex(self)
+#    def testHexHex(self):
+#        testHexHex(self)
 
 def testRectTrap(self=True):
     lay = Layer()
@@ -73,9 +73,9 @@ def testSplitTraps(self=True):
     
     inhole = Pinhole(width=width)
     right = Channel(length=4000, width=width)
-    split0 = Split(width=width, length=2500, ang=-math.pi/2)
-    split1 = Split(width=width, length=1250, ang=math.pi/6)
-    split2 = Split(width=width, length=600, ang=math.pi/6)
+    split0 = Split(width=width, length=2*2500, ang=-math.pi/2)
+    split1 = Split(width=width, length=2*1250, ang=math.pi/6)
+    split2 = Split(width=width, length=2*600, ang=math.pi/6)
     
     blocks = [inhole, right, split0, split1, split2]
     top0 = Branch(blocks)
@@ -101,7 +101,7 @@ def testSplitTraps(self=True):
     top3 = Branch(blocks)
     
     above = Channel(length=2000, width=width, ang=math.pi/6)
-    trap = RectTrap(width=width, rad=200, mwidth=30, mdepth=60, tang=2*math.pi/9)
+    trap = RectTrap(width=width, rad=200, mwidth=30+30*np.random.rand(), mdepth=30+30*np.random.rand(), tang=2*math.pi/9)
     below = Channel(length=400, width=width)
     ditch = Channel(length=400, width=width, ang=math.pi/6)
     
@@ -111,6 +111,8 @@ def testSplitTraps(self=True):
     trap1 = trap0.Copy()
     trap1.blocks[1].outnum = 1
     trap1.blocks[1].props['ang'] = -math.pi/6
+    trap1.blocks[2].props['mwidth'] = 30 + 30*np.random.rand()
+    trap1.blocks[2].props['mdepth'] = 30 + 30*np.random.rand()
     trap1.blocks[2].props['tang'] = 4*math.pi/9
     
     extra_traps = []
@@ -118,10 +120,12 @@ def testSplitTraps(self=True):
         for j, t in enumerate([trap0, trap1]):
             tmp = t.Copy()
             tmp.blocks[0] = split
+            tmp.blocks[2].props['mwidth'] = 30 + 30*np.random.rand()
+            tmp.blocks[2].props['mdepth'] = 30 + 30*np.random.rand()
             tmp.blocks[2].props['tang'] = 2*(i*2+j+3)*math.pi/9
             extra_traps.append(tmp)
             
-    left = Channel(length=6000, width=width, ang=(math.pi/3))
+    left = Channel(length=9000, width=width, ang=(math.pi/3))
     outhole = Pinhole(width=width, out=True)
     
     blocks = [ditch, left, outhole]
@@ -131,12 +135,13 @@ def testSplitTraps(self=True):
     lay0.AddBranches(branches)
     
     inhole.Place(((0,0,0),(0,100,0)))
+    
+    lay1 = lay0.Copy()
+    lay1.tmat = Layer.RotatePointMat(math.pi/2, (4000,10000,0))
     lay0.Build()
+    lay1.Build()
     
-#    lay1 = lay0.Copy()
-#    lay1.Trans(Layer.RotatePointMat(math.pi/2, (4000,10000,0)))
-    
-    lay0.Draw('layer_splittraps.ps')
+    lay0.Draw('layer_splittraps.ps', lay1)
 
 hexmoves = {0:[4,1],1:[3,0],2:[2,5],3:[1,4],4:[0,3],5:[5,2]}
 

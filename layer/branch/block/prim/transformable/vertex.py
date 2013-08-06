@@ -22,8 +22,11 @@ class Vertex(object):
     def xyz(self):
         return self.Get(3)
     
-    def _Trans(self, tmat):
+    def _Trans(self, tmat, garbage):
         self.xyzd = self.xyzd.dot(tmat.transpose())
         
     def _RetTrans(self, tmat):
         return Vertex(*self.xyzd.dot(tmat.transpose()))
+    
+    def Clean(self):
+        pass
