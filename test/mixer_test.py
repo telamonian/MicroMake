@@ -98,9 +98,10 @@ def testRectTrap(self=True):
     belowm = Channel(length=1200, width=100, ang=(-math.pi/2))
     trap = RectTrap(width=100, rad=200, mwidth=30, mdepth=60, tang=math.pi/6)
     below = Channel(length=1200, width=100)
-    left = Channel(length=800, width=150, ang=(-math.pi/2))
+    left1= Channel(length=100, width=100, ang=(-math.pi/2))
+    left = Channel(length=800, width=150)#, ang=(-math.pi/2)
     outhole = Pinhole(width=150, out=True)
-    blocks = [straight1, above, mix1, mix2, mix3, mix4, mix5, mix6, mix7, mix8, mix9, mix10, mix11, mix12, mix13, mix14, mix15, mix16, mix17, mix18, mix19, mix20,mix21a, mix21,mix21b, mix22, mix23, mix24, mix25, mix26, mix27, mix28, mix29, mix30, mix31, mix32, mix33, mix34, mix35, mix36, mix37, mix38, mix39, mix40, mix41, belowm, trap, below, left, outhole]
+    blocks = [straight1, above, mix1, mix2, mix3, mix4, mix5, mix6, mix7, mix8, mix9, mix10, mix11, mix12, mix13, mix14, mix15, mix16, mix17, mix18, mix19, mix20,mix21a, mix21,mix21b, mix22, mix23, mix24, mix25, mix26, mix27, mix28, mix29, mix30, mix31, mix32, mix33, mix34, mix35, mix36, mix37, mix38, mix39, mix40, mix41, belowm, trap, below, left1,left, outhole]
     branch = Branch(blocks)
     
     lay.AddBranch(branch)
