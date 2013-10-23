@@ -9,7 +9,7 @@ import numpy as np
 
 from layer.layer import Layer
 from layer.branch.branch import Branch
-from layer.branch.block.block import Channel, Pinhole, HexWell, RectTrap, Split
+from layer.branch.block.block import Channel, Pinhole, HexWell, RectTrap, Split, Circle
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -34,8 +34,23 @@ def testRectTrap(self=True):
     lay = Layer()
     
     inhole = Pinhole(width=100)
-    right = Channel(length=800, width=100)
-    above = Channel(length=1200, width=100, ang=(-math.pi/2))
+    right = Channel(length=6700, width=100)
+    straight0= Channel(length=3500, width=100, ang=math.pi/4)
+    straight1= Channel(length=3500, width=100, ang=-math.pi/2)
+    straight2= Channel(length=2000, width=100, ang=-(3*math.pi)/4)
+    outhole = Pinhole(width=100, out=True)
+    blocks= [inhole, right, straight0, straight1, straight2, outhole]
+    branch= Branch(blocks)
+    lay.AddBranch(branch)
+    
+        
+    straight3= Channel(length=3500, width=100, ang=-math.pi/4)
+    straight4= Channel(length=3500, width=100, ang=math.pi/2)
+    blocks=[right, straight3, straight4]
+    branch= Branch(blocks)
+    lay.AddBranch(branch)
+    
+    above = Channel(length=1200, width=100, ang=((3*math.pi)/4)+(-math.pi/2))
     mix1 = Channel(length=800, width=100, ang=(math.pi/2))
     mix2 = Channel(length=1600, width=100, ang=(-math.pi/2))
     mix3 = Channel(length=400, width=100, ang=(3*math.pi/2))
@@ -56,7 +71,10 @@ def testRectTrap(self=True):
     mix18 = Channel(length=800, width=100, ang=(-math.pi/2))
     mix19 = Channel(length=200, width=100, ang=(3*math.pi/2))
     mix20 = Channel(length=400, width=100, ang=(-math.pi/2))
-    mix21 = Channel(length=400, width=100, ang=(-3*math.pi/2))
+    mix21a= Channel(length=10, width=100, ang=(-3*math.pi/2))
+    mix21 = Circle(width=100, rad=200, tang=math.pi/6)
+    mix21b= Channel(length=10, width=100, ang=0)
+    #mix21 = Channel(length=400, width=100, ang=(-3*math.pi/2))
     mix22 = Channel(length=400, width=100, ang=(-math.pi/2))
     mix23 = Channel(length=200, width=100, ang=(-3*math.pi/2))
     mix24 = Channel(length=800, width=100, ang=(-3*math.pi/2))
@@ -79,10 +97,10 @@ def testRectTrap(self=True):
     mix41 = Channel(length=800, width=100, ang=(math.pi/2))
     belowm = Channel(length=1200, width=100, ang=(-math.pi/2))
     trap = RectTrap(width=100, rad=200, mwidth=30, mdepth=60, tang=math.pi/6)
-    below = Channel(length=2000, width=100)
-    left = Channel(length=800, width=100, ang=(-math.pi/2))
-    outhole = Pinhole(width=100, out=True)
-    blocks = [inhole, right, above, mix1, mix2, mix3, mix4, mix5, mix6, mix7, mix8, mix9, mix10, mix11, mix12, mix13, mix14, mix15, mix16, mix17, mix18, mix19, mix20, mix21, mix22, mix23, mix24, mix25, mix26, mix27, mix28, mix29, mix30, mix31, mix32, mix33, mix34, mix35, mix36, mix37, mix38, mix39, mix40, mix41, belowm, trap, below, left, outhole]
+    below = Channel(length=1200, width=100)
+    left = Channel(length=800, width=150, ang=(-math.pi/2))
+    outhole = Pinhole(width=150, out=True)
+    blocks = [straight1, above, mix1, mix2, mix3, mix4, mix5, mix6, mix7, mix8, mix9, mix10, mix11, mix12, mix13, mix14, mix15, mix16, mix17, mix18, mix19, mix20,mix21a, mix21,mix21b, mix22, mix23, mix24, mix25, mix26, mix27, mix28, mix29, mix30, mix31, mix32, mix33, mix34, mix35, mix36, mix37, mix38, mix39, mix40, mix41, belowm, trap, below, left, outhole]
     branch = Branch(blocks)
     
     lay.AddBranch(branch)
