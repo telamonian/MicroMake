@@ -279,3 +279,25 @@ class RectTrap(Block):
         '''standard prim setup'''
         self.prims = [chan, chamber, trap, mouth]
         super(RectTrap, self).Go()
+        
+class Circle(Block):
+    def __init__(self, width, rad, tang=0, **kwargs):
+        props = {'width':width, 'rad':rad, 'tang':tang}
+        inspec = [((0,0),(0,1))]
+        outspec = [((0,3),(0,2))]
+        super(Circle, self).__init__(props, inspec, outspec, **kwargs)
+        
+    def Go(self):
+        rad = self.props['rad']
+        width = self.props['width']
+        tang = self.props['tang']
+        
+        '''initialize necessary prims'''
+        chan = Rect(2*rad, width)
+        chamber = Circ(rad)
+        '''using chamber as the central shape, generate and assign tmats'''
+        cen = Vertex(*chamber.GetCentroid(True))
+        chan.tmat = Prim.RotatePointMat(math.pi/2, cen.xyz).dot(Prim.TranslateMat(chan.GetCentroid()[0:3], cen.xyz))
+        '''standard prim setup'''
+        self.prims = [chan, chamber,]
+        super(Circle, self).Go()
