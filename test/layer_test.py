@@ -26,8 +26,8 @@ class Test(unittest.TestCase):
     def testSplitTraps(self):
         testSplitTraps(self)
     
-#    def testHexHex(self):
-#        testHexHex(self)
+    def testHexHex(self):
+        testHexHex(self)
 
 def testRectTrap(self=True):
     lay = Layer()
@@ -141,7 +141,7 @@ def testSplitTraps(self=True):
     lay0.Build()
     lay1.Build()
     
-    lay0.Draw('layer_splittraps.ps', lay1)
+    lay0.Draw('layer_splittraps.ps')
 
 hexmoves = {0:[4,1],1:[3,0],2:[2,5],3:[1,4],4:[0,3],5:[5,2]}
 

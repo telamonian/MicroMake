@@ -236,12 +236,16 @@ class HexWell(Block):
         chan1 = chan0.Copy()
         chan2 = chan0.Copy()
         well = Ngon(rad, 6)
+        '''extra channel prims to close gaps between implicitly joined (as opposed to explicitly joined in the user's branches) hexwells'''
+        chan3 = Rect(cmult*rad+20, width)
+        chan4 = chan3.Copy()
+        chan5 = chan3.Copy()
         '''using well as the central shape, generate and assign tmats'''
         cen = Vertex(*well.GetCentroid())
-        for i,chan in enumerate((chan0, chan1, chan2)):
+        for i,chan in enumerate((chan0, chan1, chan2, chan3, chan4, chan5)):
             chan.tmat = Prim.RotatePointMat((.5 + i/3.0)*math.pi, cen.xyz).dot(Prim.TranslateMat(chan.GetCentroid()[0:3], cen.xyz))
         '''standard prim setup'''
-        self.prims = [chan0, chan1, chan2, well]
+        self.prims = [chan0, chan1, chan2, chan3, chan4, chan5, well]
         super(HexWell, self).Go()
         
 class RectTrap(Block):
